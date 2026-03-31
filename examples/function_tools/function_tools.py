@@ -60,7 +60,14 @@ if "chat_session" not in st.session_state:
 for content in st.session_state.chat_session.get_history():
     with st.chat_message("assistant" if content.role == "model" else "user"):
         for part in content.parts:
-            st.markdown(part.text)
+            if part.text:
+                st.markdown(part.text)
+            if part.function_call:
+                with st.status(f"{part.function_call.name} 함수 호출 요청", state="complete"):
+                    st.json(part.function_call.args)
+            if part.function_response:
+                with st.status(f"{part.function_response.name} 함수 실행 완료", state="complete"):
+                    st.json(part.function_response.response)
 
 
 if prompt := st.chat_input("챗봇에게 물어보기"):
